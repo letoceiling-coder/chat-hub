@@ -62,6 +62,13 @@ export default {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        bubble: "var(--radius-bubble)",
+        "bubble-outgoing": "var(--radius-bubble) var(--radius-bubble) 4px var(--radius-bubble)",
+        "bubble-incoming": "var(--radius-bubble) var(--radius-bubble) var(--radius-bubble) 4px",
+      },
+      boxShadow: {
+        soft: "var(--shadow-soft)",
+        modal: "var(--shadow-modal)",
       },
       keyframes: {
         "accordion-down": {

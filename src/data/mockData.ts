@@ -17,6 +17,8 @@ export const currentUser: User = {
   name: 'Александр Иванов',
   username: 'alex_ivanov',
   phone: '+7 999 123-45-67',
+  email: 'alex@example.com',
+  dateOfBirth: '1990-05-15',
   bio: 'Разработчик | Москва',
   isOnline: true,
 };
@@ -117,10 +119,18 @@ export const contacts: Contact[] = [
   },
 ];
 
-// Generate messages for a chat
+// Placeholder для медиа в демо (как в Telegram Desktop — локальные/плейсхолдеры)
+const placeholderImage = '/placeholder.svg';
+const placeholderVideo = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'; // короткий демо-ролик
+const stickerDataUrl = (emoji: string) =>
+  `data:image/svg+xml,${encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128"><rect fill="%23f0f0f0" width="128" height="128" rx="16"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="64">${emoji}</text></svg>`
+  )}`;
+
+// Generate messages for a chat — все типы сообщений по умолчанию (как в Telegram)
 const generateMessages = (chatId: string, contactId: string): Message[] => {
   const now = Date.now();
-  
+
   const messages: Message[] = [
     {
       id: `${chatId}-msg-1`,
@@ -182,9 +192,444 @@ const generateMessages = (chatId: string, contactId: string): Message[] => {
       status: 'delivered',
       isOutgoing: true,
     },
+    // Фото (image)
+    {
+      id: `${chatId}-msg-img`,
+      chatId,
+      senderId: contactId,
+      type: 'image',
+      content: 'Фото',
+      timestamp: new Date(now - 1000 * 60 * 24),
+      status: 'read',
+      isOutgoing: false,
+      mediaUrl: placeholderImage,
+    },
+    {
+      id: `${chatId}-msg-img-out`,
+      chatId,
+      senderId: 'user-1',
+      type: 'image',
+      content: 'Фото',
+      timestamp: new Date(now - 1000 * 60 * 22),
+      status: 'read',
+      isOutgoing: true,
+      mediaUrl: placeholderImage,
+    },
+    // Видео (video)
+    {
+      id: `${chatId}-msg-video`,
+      chatId,
+      senderId: 'user-1',
+      type: 'video',
+      content: 'Видео',
+      timestamp: new Date(now - 1000 * 60 * 21),
+      status: 'delivered',
+      isOutgoing: true,
+      mediaUrl: placeholderVideo,
+    },
+    // Стикер (sticker)
+    {
+      id: `${chatId}-msg-sticker`,
+      chatId,
+      senderId: contactId,
+      type: 'sticker',
+      content: 'Стикер',
+      timestamp: new Date(now - 1000 * 60 * 20),
+      status: 'read',
+      isOutgoing: false,
+      mediaUrl: stickerDataUrl('😊'),
+      stickerId: 's1-9',
+      stickerPackId: 'pack-1',
+    },
+    {
+      id: `${chatId}-msg-sticker-out`,
+      chatId,
+      senderId: 'user-1',
+      type: 'sticker',
+      content: 'Стикер',
+      timestamp: new Date(now - 1000 * 60 * 19),
+      status: 'read',
+      isOutgoing: true,
+      mediaUrl: stickerDataUrl('👍'),
+      stickerId: 's1-5',
+      stickerPackId: 'pack-1',
+    },
+    // Голосовое сообщение (voice)
+    {
+      id: `${chatId}-msg-voice`,
+      chatId,
+      senderId: contactId,
+      type: 'voice',
+      content: 'Голосовое сообщение',
+      timestamp: new Date(now - 1000 * 60 * 20),
+      status: 'read',
+      isOutgoing: false,
+      duration: 12,
+      waveform: Array.from({ length: 48 }, () => Math.random() * 0.6 + 0.2),
+      isPlayed: true,
+    },
+    {
+      id: `${chatId}-msg-voice-out`,
+      chatId,
+      senderId: 'user-1',
+      type: 'voice',
+      content: 'Голосовое сообщение',
+      timestamp: new Date(now - 1000 * 60 * 18),
+      status: 'read',
+      isOutgoing: true,
+      duration: 8,
+      waveform: Array.from({ length: 48 }, () => Math.random() * 0.5 + 0.3),
+    },
+    // Видеокружок (video_note)
+    {
+      id: `${chatId}-msg-videonote`,
+      chatId,
+      senderId: 'user-1',
+      type: 'video_note',
+      content: 'Видеокружок',
+      timestamp: new Date(now - 1000 * 60 * 15),
+      status: 'delivered',
+      isOutgoing: true,
+      duration: 5,
+      videoNoteDuration: 5,
+      mediaUrl: placeholderVideo,
+    },
+    // Файл (file)
+    {
+      id: `${chatId}-msg-file`,
+      chatId,
+      senderId: contactId,
+      type: 'file',
+      content: 'Документ',
+      timestamp: new Date(now - 1000 * 60 * 13),
+      status: 'read',
+      isOutgoing: false,
+      fileName: 'Отчёт_Q4.pdf',
+      fileSize: 1024 * 512,
+    },
+    {
+      id: `${chatId}-msg-file-out`,
+      chatId,
+      senderId: 'user-1',
+      type: 'file',
+      content: 'Архив',
+      timestamp: new Date(now - 1000 * 60 * 12),
+      status: 'read',
+      isOutgoing: true,
+      fileName: 'project.zip',
+      fileSize: 1024 * 1024 * 2,
+    },
+    // Контакт (contact)
+    {
+      id: `${chatId}-msg-contact`,
+      chatId,
+      senderId: 'user-1',
+      type: 'contact',
+      content: 'Контакт',
+      timestamp: new Date(now - 1000 * 60 * 11),
+      status: 'read',
+      isOutgoing: true,
+      contactName: 'Анна Козлова',
+      contactPhone: '+7 999 333-44-55',
+    },
+    {
+      id: `${chatId}-msg-contact-in`,
+      chatId,
+      senderId: contactId,
+      type: 'contact',
+      content: 'Контакт',
+      timestamp: new Date(now - 1000 * 60 * 10),
+      status: 'read',
+      isOutgoing: false,
+      contactName: 'Сергей Новиков',
+      contactPhone: '+7 999 444-55-66',
+    },
+    // Системное сообщение (system)
+    {
+      id: `${chatId}-msg-sys`,
+      chatId,
+      senderId: 'system',
+      type: 'system',
+      content: 'Звонок завершён',
+      timestamp: new Date(now - 1000 * 60 * 14),
+      status: 'read',
+      isOutgoing: false,
+    },
   ];
-  
+
   return messages;
+};
+
+// Сообщения в чате с ботом (команды, ответы бота)
+const generateBotMessages = (chatId: string, botId: string): Message[] => {
+  const now = Date.now();
+  return [
+    {
+      id: `${chatId}-msg-1`,
+      chatId,
+      senderId: 'user-1',
+      type: 'text',
+      content: '/start',
+      timestamp: new Date(now - 1000 * 60 * 60 * 2),
+      status: 'read',
+      isOutgoing: true,
+    },
+    {
+      id: `${chatId}-msg-2`,
+      chatId,
+      senderId: botId,
+      type: 'text',
+      content: 'Привет! Я бот. Выберите команду или нажмите кнопку:',
+      timestamp: new Date(now - 1000 * 60 * 60 * 1.98),
+      status: 'read',
+      isOutgoing: false,
+      buttons: [
+        { type: 'inline', label: '/help', action: 'help' },
+        { type: 'inline', label: '/weather', action: 'weather' },
+        { type: 'url', label: 'Подробнее на сайте', url: 'https://example.com' },
+      ],
+    },
+    {
+      id: `${chatId}-msg-3`,
+      chatId,
+      senderId: 'user-1',
+      type: 'text',
+      content: '/weather',
+      timestamp: new Date(now - 1000 * 60 * 60 * 1.5),
+      status: 'read',
+      isOutgoing: true,
+    },
+    {
+      id: `${chatId}-msg-4`,
+      chatId,
+      senderId: botId,
+      type: 'text',
+      content: '☀️ Москва: +3°C, ясно. Ветер 2 м/с. Завтра до +5°C.',
+      timestamp: new Date(now - 1000 * 60 * 60 * 1.48),
+      status: 'read',
+      isOutgoing: false,
+      buttons: [
+        { type: 'reply', label: 'Другой город', action: 'other_city' },
+        { type: 'reply', label: 'Обновить', action: 'refresh' },
+      ],
+    },
+    {
+      id: `${chatId}-msg-5`,
+      chatId,
+      senderId: 'user-1',
+      type: 'text',
+      content: 'Спасибо!',
+      timestamp: new Date(now - 1000 * 60 * 30),
+      status: 'read',
+      isOutgoing: true,
+    },
+    {
+      id: `${chatId}-msg-6`,
+      chatId,
+      senderId: botId,
+      type: 'text',
+      content: 'Пожалуйста! Если нужна погода в другом городе — напиши название.',
+      timestamp: new Date(now - 1000 * 60 * 28),
+      status: 'read',
+      isOutgoing: false,
+    },
+  ];
+};
+
+// Сообщения помощника (второй бот)
+const generateHelperBotMessages = (chatId: string, botId: string): Message[] => {
+  const now = Date.now();
+  return [
+    {
+      id: `${chatId}-msg-1`,
+      chatId,
+      senderId: 'user-1',
+      type: 'text',
+      content: '/start',
+      timestamp: new Date(now - 1000 * 60 * 60 * 24),
+      status: 'read',
+      isOutgoing: true,
+    },
+    {
+      id: `${chatId}-msg-2`,
+      chatId,
+      senderId: botId,
+      type: 'text',
+      content: 'Здравствуйте! Я Помощник. Выберите опцию:',
+      timestamp: new Date(now - 1000 * 60 * 60 * 23.98),
+      status: 'read',
+      isOutgoing: false,
+      buttons: [
+        { type: 'inline', label: 'Настройки', action: 'settings' },
+        { type: 'inline', label: 'Частые вопросы', action: 'faq' },
+        { type: 'url', label: 'Перейти на сайт', url: 'https://example.com/support' },
+      ],
+    },
+    {
+      id: `${chatId}-msg-3`,
+      chatId,
+      senderId: 'user-1',
+      type: 'text',
+      content: 'Как отключить уведомления в группе?',
+      timestamp: new Date(now - 1000 * 60 * 60 * 20),
+      status: 'read',
+      isOutgoing: true,
+    },
+    {
+      id: `${chatId}-msg-4`,
+      chatId,
+      senderId: botId,
+      type: 'text',
+      content: 'Зажмите название чата в списке → «Отключить уведомления» или свайпните чат влево и нажмите «Звук выкл».',
+      timestamp: new Date(now - 1000 * 60 * 60 * 19.98),
+      status: 'read',
+      isOutgoing: false,
+    },
+  ];
+};
+
+// Посты канала с просмотрами, реакциями и комментариями (как в Telegram)
+const generateChannelMessages = (chatId: string, _channelName: string): Message[] => {
+  const now = Date.now();
+  const post1 = `${chatId}-post-1`;
+  const post2 = `${chatId}-post-2`;
+  return [
+    {
+      id: post1,
+      chatId,
+      senderId: chatId,
+      type: 'text',
+      content: 'Релиз React 19: улучшенный компайлер, Actions, use() и многое другое. Подробности в блоге.',
+      timestamp: new Date(now - 1000 * 60 * 60 * 2),
+      status: 'read',
+      isOutgoing: false,
+      views: 1247,
+      reactions: [
+        { emoji: '👍', count: 89, userIds: [] },
+        { emoji: '❤️', count: 42, userIds: [] },
+        { emoji: '😂', count: 31, userIds: [] },
+      ],
+    },
+    {
+      id: `${chatId}-comment-1`,
+      chatId,
+      senderId: 'user-1',
+      type: 'text',
+      content: 'Уже обновился, всё летает!',
+      timestamp: new Date(now - 1000 * 60 * 60 * 1.9),
+      status: 'read',
+      isOutgoing: true,
+      replyTo: post1,
+    },
+    {
+      id: `${chatId}-comment-2`,
+      chatId,
+      senderId: 'contact-2',
+      type: 'text',
+      content: 'Спасибо за пост, ждал use()',
+      timestamp: new Date(now - 1000 * 60 * 60 * 1.8),
+      status: 'read',
+      isOutgoing: false,
+      replyTo: post1,
+    },
+    {
+      id: post2,
+      chatId,
+      senderId: chatId,
+      type: 'image',
+      content: 'Скриншот интерфейса',
+      timestamp: new Date(now - 1000 * 60 * 60 * 5),
+      status: 'read',
+      isOutgoing: false,
+      mediaUrl: placeholderImage,
+      views: 892,
+      reactions: [
+        { emoji: '👍', count: 56, userIds: [] },
+        { emoji: '😮', count: 12, userIds: [] },
+      ],
+    },
+    {
+      id: `${chatId}-post-3`,
+      chatId,
+      senderId: chatId,
+      type: 'text',
+      content: 'TypeScript 5.6 вышел в бета: улучшения производительности и новые проверки типов.',
+      timestamp: new Date(now - 1000 * 60 * 60 * 8),
+      status: 'read',
+      isOutgoing: false,
+      views: 534,
+      reactions: [
+        { emoji: '👍', count: 28, userIds: [] },
+      ],
+    },
+    {
+      id: `${chatId}-post-4`,
+      chatId,
+      senderId: chatId,
+      type: 'text',
+      content: 'Как настроить CI/CD за 10 минут: гайд для небольших команд.',
+      timestamp: new Date(now - 1000 * 60 * 60 * 24),
+      status: 'read',
+      isOutgoing: false,
+      views: 210,
+      reactions: [
+        { emoji: '😢', count: 15, userIds: [] },
+        { emoji: '👍', count: 8, userIds: [] },
+      ],
+    },
+  ];
+};
+
+// Посты второго канала с просмотрами и реакциями
+const generateNewsChannelMessages = (chatId: string): Message[] => {
+  const now = Date.now();
+  return [
+    {
+      id: `${chatId}-post-1`,
+      chatId,
+      senderId: chatId,
+      type: 'text',
+      content: 'Главное за сегодня: курс рубля, погода в регионах, события в мире IT.',
+      timestamp: new Date(now - 1000 * 60 * 60 * 1),
+      status: 'read',
+      isOutgoing: false,
+      views: 3420,
+      reactions: [
+        { emoji: '👍', count: 156, userIds: [] },
+        { emoji: '😂', count: 44, userIds: [] },
+      ],
+    },
+    {
+      id: `${chatId}-post-2`,
+      chatId,
+      senderId: chatId,
+      type: 'text',
+      content: '📊 Рынки закрылись в плюсе. Технологический сектор вырос на 1.2%.',
+      timestamp: new Date(now - 1000 * 60 * 60 * 12),
+      status: 'read',
+      isOutgoing: false,
+      views: 1890,
+      reactions: [
+        { emoji: '😮', count: 78, userIds: [] },
+        { emoji: '👍', count: 32, userIds: [] },
+      ],
+    },
+    {
+      id: `${chatId}-post-3`,
+      chatId,
+      senderId: chatId,
+      type: 'image',
+      content: 'Инфографика дня',
+      timestamp: new Date(now - 1000 * 60 * 60 * 24),
+      status: 'read',
+      isOutgoing: false,
+      mediaUrl: placeholderImage,
+      views: 756,
+      reactions: [
+        { emoji: '❤️', count: 21, userIds: [] },
+      ],
+    },
+  ];
 };
 
 // Chats
@@ -355,6 +800,100 @@ export const chats: Chat[] = [
       isOutgoing: false,
     },
   },
+  // Боты (с клавиатурой: кнопки #25D366, 14px)
+  {
+    id: 'bot-1',
+    name: 'Погода Бот',
+    username: 'weather_bot',
+    isGroup: false,
+    isBot: true,
+    unreadCount: 0,
+    isPinned: false,
+    isMuted: false,
+    isArchived: false,
+    keyboard: [
+      [{ label: '/start', action: 'start' }, { label: '/help', action: 'help' }],
+      [{ label: '/weather', action: 'weather' }],
+    ],
+    lastMessage: {
+      id: 'last-bot-1',
+      chatId: 'bot-1',
+      senderId: 'bot-1',
+      type: 'text',
+      content: 'Пожалуйста! Если нужна погода в другом городе — напиши название.',
+      timestamp: new Date(Date.now() - 1000 * 60 * 28),
+      status: 'read',
+      isOutgoing: false,
+    },
+  },
+  {
+    id: 'bot-2',
+    name: 'Помощник',
+    username: 'helper_bot',
+    isGroup: false,
+    isBot: true,
+    unreadCount: 1,
+    isPinned: false,
+    isMuted: false,
+    isArchived: false,
+    keyboard: [
+      [{ label: 'Настройки', action: 'settings' }, { label: 'Помощь', action: 'help' }],
+      [{ label: 'Частые вопросы', action: 'faq' }],
+    ],
+    lastMessage: {
+      id: 'last-bot-2',
+      chatId: 'bot-2',
+      senderId: 'bot-2',
+      type: 'text',
+      content: 'Зажмите название чата в списке → «Отключить уведомления» или свайпните чат влево и нажмите «Звук выкл».',
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 19.98),
+      status: 'read',
+      isOutgoing: false,
+    },
+  },
+  // Каналы
+  {
+    id: 'channel-1',
+    name: 'Технологии',
+    username: 'tech_channel',
+    isGroup: false,
+    isChannel: true,
+    unreadCount: 2,
+    isPinned: true,
+    isMuted: false,
+    isArchived: false,
+    lastMessage: {
+      id: 'last-ch-1',
+      chatId: 'channel-1',
+      senderId: 'channel-1',
+      type: 'text',
+      content: 'Релиз React 19: улучшенный компайлер, Actions, use() и многое другое. Подробности в блоге.',
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
+      status: 'read',
+      isOutgoing: false,
+    },
+  },
+  {
+    id: 'channel-2',
+    name: 'Новости дня',
+    username: 'news_channel',
+    isGroup: false,
+    isChannel: true,
+    unreadCount: 0,
+    isPinned: false,
+    isMuted: false,
+    isArchived: false,
+    lastMessage: {
+      id: 'last-ch-2',
+      chatId: 'channel-2',
+      senderId: 'channel-2',
+      type: 'text',
+      content: 'Главное за сегодня: курс рубля, погода в регионах, события в мире IT.',
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 1),
+      status: 'read',
+      isOutgoing: false,
+    },
+  },
 ];
 
 // Calls history
@@ -414,6 +953,10 @@ export const messagesByChat: Record<string, Message[]> = {
   'chat-6': generateMessages('chat-6', 'contact-1'),
   'chat-7': generateMessages('chat-7', 'contact-5'),
   'chat-8': generateMessages('chat-8', 'contact-6'),
+  'bot-1': generateBotMessages('bot-1', 'bot-1'),
+  'bot-2': generateHelperBotMessages('bot-2', 'bot-2'),
+  'channel-1': generateChannelMessages('channel-1', 'Технологии'),
+  'channel-2': generateNewsChannelMessages('channel-2'),
 };
 
 // Helper functions
@@ -446,6 +989,13 @@ export const formatLastSeen = (date: Date): string => {
 
 export const formatMessageTime = (date: Date): string => {
   return date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+};
+
+/** Формат просмотров как в Telegram: 1.2K, 10K */
+export const formatViews = (views: number): string => {
+  if (views >= 1_000_000) return `${(views / 1_000_000).toFixed(1).replace(/\.0$/, '')}M`;
+  if (views >= 1_000) return `${(views / 1_000).toFixed(1).replace(/\.0$/, '')}K`;
+  return String(views);
 };
 
 export const formatCallDuration = (seconds: number): string => {

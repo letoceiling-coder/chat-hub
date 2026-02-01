@@ -3,11 +3,14 @@ import { Phone, Video, PhoneIncoming, PhoneOutgoing, PhoneMissed } from 'lucide-
 import { Button } from '@/components/ui/button';
 import UserAvatar from '@/components/common/Avatar';
 import { calls, formatCallDuration } from '@/data/mockData';
+import { useCall } from '@/context/CallContext';
 import { Call } from '@/types/messenger';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 const CallsPage = () => {
+  const { startOutgoingCall, setIncomingCall } = useCall();
+
   // Group calls by date
   const groupedCalls = useMemo(() => {
     const today = new Date();
@@ -95,9 +98,22 @@ const CallsPage = () => {
       <header className="sticky top-0 z-40 bg-background border-b border-border pt-safe">
         <div className="flex items-center justify-between h-14 px-4">
           <h1 className="text-xl font-semibold">Звонки</h1>
-          <Button variant="ghost" size="sm" className="text-primary">
-            Изменить
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground text-xs"
+              onClick={() => {
+                const contact = calls[0]?.contact;
+                if (contact) setIncomingCall(contact, 'audio');
+              }}
+            >
+              Тест входящего
+            </Button>
+            <Button variant="ghost" size="sm" className="text-primary">
+              Изменить
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -143,11 +159,12 @@ const CallsPage = () => {
                     </div>
                   </div>
                   
-                  {/* Call button */}
+                  {/* Call button — spec 10: start outgoing call */}
                   <Button
                     variant="ghost"
                     size="icon"
                     className="text-primary shrink-0"
+                    onClick={() => startOutgoingCall(call.contact, call.type)}
                   >
                     {call.type === 'video' ? (
                       <Video className="h-5 w-5" />

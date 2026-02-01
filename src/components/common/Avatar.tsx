@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 interface AvatarProps {
   src?: string;
   name: string;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   isOnline?: boolean;
   className?: string;
 }
@@ -33,6 +33,7 @@ const sizeClasses = {
   md: 'h-10 w-10 text-sm',
   lg: 'h-12 w-12 text-base',
   xl: 'h-16 w-16 text-lg',
+  '2xl': 'h-24 w-24 text-2xl',
 };
 
 const onlineSizeClasses = {
@@ -40,6 +41,7 @@ const onlineSizeClasses = {
   md: 'h-3 w-3 right-0 bottom-0',
   lg: 'h-3.5 w-3.5 right-0.5 bottom-0.5',
   xl: 'h-4 w-4 right-1 bottom-1',
+  '2xl': 'h-5 w-5 right-2 bottom-2',
 };
 
 const UserAvatar = ({ src, name, size = 'md', isOnline, className }: AvatarProps) => {

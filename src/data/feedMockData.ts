@@ -2,57 +2,44 @@ import type { FeedPost, FeedStory, FeedComment, FeedUser, FeedNotification } fro
 
 const now = Date.now();
 
-/** Реалистичные фото и видео из открытых источников */
+/** Локальные фото и видео (public/media/feed/) */
 const images = {
-  // Природа и пейзажи
-  nature1: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
-  nature2: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=80',
-  nature3: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80',
-  sunset: 'https://images.unsplash.com/photo-1495616811223-4d98c6e9c869?w=800&q=80',
-  beach: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80',
-  mountains: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80',
-  
-  // Город и архитектура
-  city1: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=800&q=80',
-  city2: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&q=80',
-  city3: 'https://images.unsplash.com/photo-1514565131-fce0801e5785?w=800&q=80',
-  moscow: 'https://images.unsplash.com/photo-1513326738677-b964603b136d?w=800&q=80',
-  spb: 'https://images.unsplash.com/photo-1556610961-2fecc5927173?w=800&q=80',
-  
-  // Технологии и работа
-  code: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&q=80',
-  laptop: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&q=80',
-  office: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80',
-  conference: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80',
-  
-  // Еда и напитки
-  coffee: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800&q=80',
-  breakfast: 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=800&q=80',
-  food1: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80',
-  
-  // Книги и хобби
-  books: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=800&q=80',
-  reading: 'https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?w=800&q=80',
-  
-  // Люди и портреты
-  people1: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80',
-  selfie: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&q=80',
-  team: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80',
-  
-  // Аватары
-  avatar1: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&q=80',
-  avatar2: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&q=80',
-  avatar3: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&q=80',
-  avatar4: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&q=80',
-  avatar5: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&q=80',
-  avatar6: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&q=80',
+  nature1: '/media/feed/images/nature1.jpg',
+  nature2: '/media/feed/images/nature2.jpg',
+  nature3: '/media/feed/images/nature3.jpg',
+  sunset: '/media/feed/images/sunset.jpg',
+  beach: '/media/feed/images/beach.jpg',
+  mountains: '/media/feed/images/mountains.jpg',
+  city1: '/media/feed/images/city1.jpg',
+  city2: '/media/feed/images/city2.jpg',
+  city3: '/media/feed/images/city3.jpg',
+  moscow: '/media/feed/images/moscow.jpg',
+  spb: '/media/feed/images/spb.jpg',
+  code: '/media/feed/images/code.jpg',
+  laptop: '/media/feed/images/laptop.jpg',
+  office: '/media/feed/images/office.jpg',
+  conference: '/media/feed/images/conference.jpg',
+  coffee: '/media/feed/images/coffee.jpg',
+  breakfast: '/media/feed/images/breakfast.jpg',
+  food1: '/media/feed/images/food1.jpg',
+  books: '/media/feed/images/books.jpg',
+  reading: '/media/feed/images/reading.jpg',
+  people1: '/media/feed/images/people1.jpg',
+  selfie: '/media/feed/images/selfie.jpg',
+  team: '/media/feed/images/team.jpg',
+  avatar1: '/media/feed/images/avatar1.jpg',
+  avatar2: '/media/feed/images/avatar2.jpg',
+  avatar3: '/media/feed/images/avatar3.jpg',
+  avatar4: '/media/feed/images/avatar4.jpg',
+  avatar5: '/media/feed/images/avatar5.jpg',
+  avatar6: '/media/feed/images/avatar6.jpg',
 };
 
-/** Тестовые видео (короткие, публичные) */
+/** Локальные видео */
 const videos = {
-  nature: 'https://www.w3schools.com/html/mov_bbb.mp4',
-  coding: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-  travel: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+  nature: '/media/feed/videos/nature.mp4',
+  coding: '/media/feed/videos/coding.mp4',
+  travel: '/media/feed/videos/travel.mp4',
 };
 
 /** Мок-авторы ленты (для отображения имени и аватара) */

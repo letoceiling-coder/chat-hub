@@ -121,7 +121,7 @@ export const contacts: Contact[] = [
 
 // Placeholder для медиа в демо (как в Telegram Desktop — локальные/плейсхолдеры)
 const placeholderImage = '/placeholder.svg';
-const placeholderVideo = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'; // короткий демо-ролик
+const placeholderVideo = '/media/feed/videos/coding.mp4'; // короткий демо-ролик
 const stickerDataUrl = (emoji: string) =>
   `data:image/svg+xml,${encodeURIComponent(
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128"><rect fill="%23f0f0f0" width="128" height="128" rx="16"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="64">${emoji}</text></svg>`

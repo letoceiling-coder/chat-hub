@@ -142,6 +142,7 @@ export function MessagesProvider({ children }: { children: React.ReactNode }) {
 
   const value: MessagesContextValue = {
     getMessages,
+    getAllMessages: getFullMessages,
     setMessagesForChat,
     addMessageToChat,
     deleteMessage,

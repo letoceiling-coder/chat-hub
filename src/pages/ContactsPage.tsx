@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Menu, Search, UserPlus } from 'lucide-react';
+import { Menu, Search, UserPlus, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import UserAvatar from '@/components/common/Avatar';
@@ -215,12 +215,17 @@ const ContactsPage = () => {
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-            <p className="text-lg">Контакты не найдены</p>
-            {searchQuery && (
-              <p className="text-sm mt-1">Попробуйте изменить запрос</p>
-            )}
-          </div>
+          <EmptyState
+            icon={Users}
+            title={searchQuery ? 'Контакты не найдены' : 'Нет контактов'}
+            description={
+              searchQuery
+                ? 'Попробуйте изменить поисковый запрос'
+                : 'Добавьте контакт, чтобы начать общение'
+            }
+            actionLabel={!searchQuery ? 'Добавить контакт' : undefined}
+            onAction={!searchQuery ? () => setAddContactOpen(true) : undefined}
+          />
         )}
 
         {/* Archived — spec 11.8: separate block, pull to show */}

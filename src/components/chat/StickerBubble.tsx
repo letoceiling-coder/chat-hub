@@ -68,7 +68,6 @@ export default function StickerBubble({
       </ContextMenuTrigger>
       <ContextMenuContent
         className="w-56 rounded-xl shadow-modal border bg-popover"
-        sideOffset={4}
       >
         <ContextMenuItem
           onSelect={() => {

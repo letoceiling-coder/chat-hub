@@ -1,3 +1,4 @@
+import { ThemeProvider } from "next-themes";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
@@ -52,6 +53,7 @@ const App = () => (
             <CallProvider>
               <MessagesProvider>
                 <FeedProvider>
+                <ThemeProvider attribute="class" defaultTheme="system" storageKey="messenger-theme" enableSystem>
                 <TooltipProvider>
                   <BrowserRouter>
                     <CallOverlay />
@@ -83,6 +85,7 @@ const App = () => (
                     </Routes>
                   </BrowserRouter>
                 </TooltipProvider>
+                </ThemeProvider>
                 </FeedProvider>
               </MessagesProvider>
             </CallProvider>

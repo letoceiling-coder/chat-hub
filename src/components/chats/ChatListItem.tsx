@@ -289,17 +289,13 @@ const ChatListItem = ({
 
   return (
     <div className="relative overflow-hidden border-b border-border">
-      {/* Кнопки действий справа — те же обработчики свайпа, чтобы работало при касании в области кнопок */}
+      {/* Кнопки действий справа — pointer-events: none когда закрыто, чтобы касания проходили к контенту и свайп работал по всей ширине */}
       <div
-        className="absolute top-0 right-0 bottom-0 flex items-stretch touch-none"
+        className={cn(
+          'absolute top-0 right-0 bottom-0 flex items-stretch touch-none',
+          !revealed && 'pointer-events-none'
+        )}
         style={{ width: ACTIONS_WIDTH }}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onPointerLeave={handlePointerLeave}
       >
         <AnimatePresence>
           {revealed &&
@@ -333,10 +329,10 @@ const ChatListItem = ({
         </AnimatePresence>
       </div>
 
-      {/* Контент чата — плавно смещается влево при свайпе влево */}
+      {/* Контент чата — плавно смещается влево при свайпе влево; по всей ширине принимает касания */}
       <motion.div
         ref={swipeContainerRef}
-        className="flex items-center min-w-full"
+        className="flex items-center min-w-full touch-pan-y"
         animate={{ x: isDragging ? dragX : revealed ? -ACTIONS_WIDTH : 0 }}
         transition={isDragging ? { duration: 0 } : { type: 'spring', stiffness: 400, damping: 40 }}
         style={{ willChange: isDragging || revealed ? 'transform' : 'auto' }}

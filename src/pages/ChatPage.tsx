@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Phone, Video, MoreVertical, Paperclip, Smile, Send, Mic, Check, CheckCheck, Reply, Copy, Trash2, Forward, Pin, Pencil, FileText, Sticker, X } from 'lucide-react';
+import { ArrowLeft, Phone, Video, MoreVertical, Paperclip, Smile, Send, Mic, Check, CheckCheck, Reply, Copy, Trash2, Forward, Pin, Pencil, FileText, Sticker as StickerIcon, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import UserAvatar from '@/components/common/Avatar';
@@ -978,7 +978,6 @@ const ChatPage = () => {
                   </ContextMenuTrigger>
                   <ContextMenuContent
                     className="w-56 rounded-xl shadow-modal border bg-popover"
-                    sideOffset={4}
                   >
                     <ContextMenuItem
                       onSelect={() => {
@@ -1632,7 +1631,7 @@ function StickerButtonAndPanel() {
         aria-label="Стикеры"
         onClick={openPanel}
       >
-        <Sticker className="h-5 w-5" />
+        <StickerIcon className="h-5 w-5" />
       </Button>
       <StickerPanel />
     </>

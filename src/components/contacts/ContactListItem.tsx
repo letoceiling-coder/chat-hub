@@ -97,7 +97,6 @@ export default function ContactListItem({
       </ContextMenuTrigger>
       <ContextMenuContent
         className="w-56 rounded-xl shadow-modal border bg-popover"
-        sideOffset={4}
       >
         <ContextMenuItem onSelect={() => onClick()} className="cursor-pointer">
           <MessageCircle className="mr-2 h-4 w-4" />

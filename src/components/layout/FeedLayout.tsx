@@ -1,5 +1,6 @@
-import { Outlet, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import FeedBottomNav from './FeedBottomNav';
+import PageTransition from '@/components/common/PageTransition';
 import { useFeed } from '@/context/FeedContext';
 
 const FeedLayout = () => {
@@ -10,7 +11,7 @@ const FeedLayout = () => {
   return (
     <div className="min-h-screen bg-background">
       <main className={hideBottomNav ? '' : 'pb-16'}>
-        <Outlet />
+        <PageTransition />
       </main>
       {!hideBottomNav && <FeedBottomNav notificationCount={unreadNotificationsCount} />}
     </div>

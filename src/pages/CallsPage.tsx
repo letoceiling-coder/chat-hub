@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { Phone, Video, PhoneIncoming, PhoneOutgoing, PhoneMissed } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import UserAvatar from '@/components/common/Avatar';
+import EmptyState from '@/components/common/EmptyState';
 import { calls, formatCallDuration } from '@/data/mockData';
 import { useCall } from '@/context/CallContext';
 import { Call } from '@/types/messenger';
@@ -177,11 +178,11 @@ const CallsPage = () => {
             </div>
           ))
         ) : (
-          <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-            <Phone className="h-12 w-12 mb-4 opacity-50" />
-            <p className="text-lg">Нет звонков</p>
-            <p className="text-sm mt-1">Ваши звонки появятся здесь</p>
-          </div>
+          <EmptyState
+            icon={Phone}
+            title="Нет звонков"
+            description="История звонков появится здесь после первого разговора"
+          />
         )}
       </motion.div>
     </div>

@@ -1,8 +1,14 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { MessageCircle } from 'lucide-react';
 import ChatListHeader from '@/components/chats/ChatListHeader';
 import ChatListItem from '@/components/chats/ChatListItem';
+import EmptyState from '@/components/common/EmptyState';
+import { PullToRefresh } from '@/components/common/PullToRefresh';
+import { ChatListSkeleton } from '@/components/common/ChatListSkeleton';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { useChats } from '@/context/ChatsContext';
+import { useMessages } from '@/context/MessagesContext';
 import { Chat } from '@/types/messenger';
 import { motion } from 'framer-motion';
 import {
@@ -19,9 +25,24 @@ import {
 const ChatsPage = () => {
   const navigate = useNavigate();
   const { chats, pinChat, muteChat, archiveChat, deleteChat } = useChats();
+  const { getAllMessages } = useMessages();
   const [searchQuery, setSearchQuery] = useState('');
   const [chatToDelete, setChatToDelete] = useState<Chat | null>(null);
   const [openedChatId, setOpenedChatId] = useState<string | null>(null);
+  const [initialLoad, setInitialLoad] = useState(true);
+
+  const doRefresh = async () => {
+    await new Promise((r) => setTimeout(r, 600));
+  };
+  const { pullY, refreshing, progress, handlers } = usePullToRefresh({
+    onRefresh: doRefresh,
+    enabled: true,
+  });
+
+  useEffect(() => {
+    const t = setTimeout(() => setInitialLoad(false), 350);
+    return () => clearTimeout(t);
+  }, []);
 
   const sortedChats = useMemo(() => {
     let filtered = [...chats].filter((chat) => !chat.isArchived);
@@ -42,7 +63,7 @@ const ChatsPage = () => {
       const timeB = b.lastMessage?.timestamp.getTime() || 0;
       return timeB - timeA;
     });
-  }, [chats, searchQuery]);
+  }, [chats, searchQuery, getAllMessages]);
 
   const handleChatClick = (chat: Chat) => {
     navigate(`/chat/${chat.id}`);
@@ -56,37 +77,45 @@ const ChatsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="h-screen flex flex-col bg-background">
       <ChatListHeader searchQuery={searchQuery} onSearch={setSearchQuery} />
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="divide-y divide-border"
-      >
-        {sortedChats.length > 0 ? (
-          sortedChats.map((chat) => (
-            <ChatListItem
-              key={chat.id}
-              chat={chat}
-              onClick={() => handleChatClick(chat)}
-              onPin={(c) => pinChat(c.id, !c.isPinned)}
-              onMute={(c) => muteChat(c.id, !c.isMuted)}
-              onArchive={(c) => archiveChat(c.id, !c.isArchived)}
-              onDelete={(c) => setChatToDelete(c)}
-              isRevealed={openedChatId === chat.id}
-              onRevealChange={setOpenedChatId}
+      <PullToRefresh pullY={pullY} refreshing={refreshing} progress={progress} handlers={handlers}>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex-1 min-h-0 overflow-auto divide-y divide-border"
+          style={{ touchAction: 'pan-y' }}
+        >
+          {initialLoad ? (
+            <ChatListSkeleton />
+          ) : sortedChats.length > 0 ? (
+            sortedChats.map((chat) => (
+              <ChatListItem
+                key={chat.id}
+                chat={chat}
+                onClick={() => handleChatClick(chat)}
+                onPin={(c) => pinChat(c.id, !c.isPinned)}
+                onMute={(c) => muteChat(c.id, !c.isMuted)}
+                onArchive={(c) => archiveChat(c.id, !c.isArchived)}
+                onDelete={(c) => setChatToDelete(c)}
+                isRevealed={openedChatId === chat.id}
+                onRevealChange={setOpenedChatId}
+              />
+            ))
+          ) : (
+            <EmptyState
+              icon={MessageCircle}
+              title={searchQuery ? 'Чаты не найдены' : 'Нет чатов'}
+              description={
+                searchQuery
+                  ? 'Попробуйте изменить поисковый запрос'
+                  : 'Начните общение — выберите контакт или создайте новый чат'
+              }
             />
-          ))
-        ) : (
-          <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-            <p className="text-lg">Чаты не найдены</p>
-            {searchQuery && (
-              <p className="text-sm mt-1">Попробуйте изменить запрос</p>
-            )}
-          </div>
-        )}
-      </motion.div>
+          )}
+        </motion.div>
+      </PullToRefresh>
 
       <AlertDialog open={!!chatToDelete} onOpenChange={(open) => !open && setChatToDelete(null)}>
         <AlertDialogContent className="rounded-2xl shadow-modal max-w-[calc(100%-32px)]">

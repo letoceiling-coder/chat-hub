@@ -49,6 +49,7 @@ const FeedSearchPage = () => {
     const hashtags = Array.from(hashtagsSet).slice(0, 5);
     return { users, hashtags };
   }, [q, posts]);
+  const hasSuggestions = suggestions.users.length > 0 || suggestions.hashtags.length > 0;
 
   const recommendedUsers = useMemo(() => {
     let list = feedUsers.filter((u) => u.id !== CURRENT_USER_ID);
@@ -117,7 +118,7 @@ const FeedSearchPage = () => {
               onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
               className="pl-9 rounded-xl"
             />
-            {showSuggestions && q && (suggestions.users.length > 0 || suggestions.hashtags.length > 0) && (
+            {showSuggestions && q && hasSuggestions && (
               <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-lg max-h-64 overflow-y-auto z-50">
                 {suggestions.users.length > 0 && (
                   <div className="p-2">

@@ -17,6 +17,8 @@ interface FeedContextValue {
   likePost: (postId: string) => void;
   addComment: (postId: string, text: string, parentId?: string) => void;
   likeComment: (commentId: string) => void;
+  deleteComment: (postId: string, commentId: string) => void;
+  canDeleteComment: (postId: string, commentId: string) => boolean;
   addPost: (post: Omit<FeedPost, 'id' | 'createdAt' | 'likeCount' | 'commentCount' | 'likedByCurrentUser'>) => void;
   addStory: (story: Omit<FeedStory, 'id' | 'createdAt' | 'expiresAt'>) => void;
   updatePostVisibility: (postId: string, visibility: 'public' | 'followers_only') => void;

@@ -82,6 +82,7 @@ export function ChatsProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo<ChatsContextValue>(
     () => ({
       chats,
+      addChat,
       updateChat,
       deleteChat,
       getChatById,

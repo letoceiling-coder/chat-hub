@@ -33,6 +33,7 @@ const FeedPostPage = () => {
     likeComment,
     deleteComment,
     canDeleteComment,
+    updatePostVisibility,
   } = useFeed();
   const [commentText, setCommentText] = useState('');
   const [shareSheetOpen, setShareSheetOpen] = useState(false);

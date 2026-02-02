@@ -1,4 +1,5 @@
-import { Outlet, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import PageTransition from '@/components/common/PageTransition';
 import BottomNav from './BottomNav';
 import { useMemo } from 'react';
 import { useChats } from '@/context/ChatsContext';
@@ -41,7 +42,7 @@ const MainLayout = () => {
         )}
       </AnimatePresence>
       <main className={hideBottomNav ? '' : 'pb-16'}>
-        <Outlet />
+        <PageTransition />
       </main>
 
       {!hideBottomNav && (

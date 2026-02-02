@@ -46,7 +46,7 @@ const ChatListHeader = ({ onSearch, searchQuery }: ChatListHeaderProps) => {
               </Button>
               <Input
                 type="text"
-                placeholder="Поиск..."
+                placeholder="Чаты и сообщения..."
                 value={searchQuery}
                 onChange={(e) => onSearch(e.target.value)}
                 autoFocus

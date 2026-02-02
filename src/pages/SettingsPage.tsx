@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from 'next-themes';
 import { useAuth } from '@/context/AuthContext';
 import {
   User,
@@ -72,16 +73,6 @@ const SettingItem = ({
   </motion.div>
 );
 
-const applyTheme = (theme: 'light' | 'dark' | 'system') => {
-  const root = document.documentElement;
-  if (theme === 'system') {
-    const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    root.classList.toggle('dark', dark);
-  } else {
-    root.classList.toggle('dark', theme === 'dark');
-  }
-};
-
 const applyFontSize = (size: 'small' | 'medium' | 'large') => {
   document.documentElement.dataset.fontSize = size;
   const scale = size === 'small' ? 0.9375 : size === 'large' ? 1.0625 : 1;
@@ -91,17 +82,19 @@ const applyFontSize = (size: 'small' | 'medium' | 'large') => {
 const SettingsPage = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const { theme, setTheme } = useTheme();
   const [settings, setSettings] = useState<Settings>(defaultSettings);
   const [logoutOpen, setLogoutOpen] = useState(false);
   const [appearanceOpen, setAppearanceOpen] = useState(false);
 
   useEffect(() => {
-    applyTheme(settings.theme);
     applyFontSize(settings.fontSize);
-  }, [settings.theme, settings.fontSize]);
+  }, [settings.fontSize]);
 
-  const setTheme = (theme: 'light' | 'dark' | 'system') => {
-    setSettings((s) => ({ ...s, theme }));
+  const handleThemeChange = (value: string) => {
+    const v = value as 'light' | 'dark' | 'system';
+    setTheme(v);
+    setSettings((s) => ({ ...s, theme: v }));
   };
 
   const setFontSize = (fontSize: 'small' | 'medium' | 'large') => {
@@ -236,8 +229,8 @@ const SettingsPage = () => {
                 Тема
               </Label>
               <RadioGroup
-                value={settings.theme}
-                onValueChange={(v) => setTheme(v as 'light' | 'dark' | 'system')}
+                value={theme ?? settings.theme}
+                onValueChange={handleThemeChange}
                 className="flex flex-col gap-2"
               >
                 <label className="flex items-center gap-3 p-3 rounded-xl border cursor-pointer hover:bg-secondary/50 has-[:checked]:border-primary has-[:checked]:bg-primary/5">

@@ -7,6 +7,10 @@
 #   bash scripts/server-pull-and-deploy.sh
 
 cd "$(dirname "$0")/.."
+REPO_ROOT="$(pwd)"
+
+# Убирает ошибку "dubious ownership" при запуске от пользователя веб-сервера (www-data)
+git config --global --add safe.directory "$REPO_ROOT" 2>/dev/null || true
 
 echo "=== Git pull ==="
 if ! git pull origin main; then

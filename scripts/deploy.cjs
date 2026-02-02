@@ -9,12 +9,23 @@
  *   node scripts/deploy.cjs "сообщение коммита"
  */
 const path = require('path');
+const fs = require('fs');
 const { execSync } = require('child_process');
 const https = require('https');
 const http = require('http');
 
 const rootDir = path.join(__dirname, '..');
 const commitMsg = process.argv[2] || `Deploy ${new Date().toISOString().slice(0, 19).replace('T', ' ')}`;
+
+// Загрузка .env.deploy (DEPLOY_WEBHOOK_URL), если есть
+const envDeployPath = path.join(rootDir, '.env.deploy');
+if (fs.existsSync(envDeployPath)) {
+  const content = fs.readFileSync(envDeployPath, 'utf8');
+  content.split('\n').forEach((line) => {
+    const m = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)\s*$/);
+    if (m) process.env[m[1]] = m[2].replace(/^["']|["']$/g, '').trim();
+  });
+}
 const webhookUrl = process.env.DEPLOY_WEBHOOK_URL || '';
 
 function run(cmd, options = {}) {

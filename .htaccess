@@ -8,8 +8,8 @@
   RewriteEngine On
   RewriteBase /
   
-  # НЕ перенаправлять статику (assets, media, favicon и т.д.)
-  RewriteCond %{REQUEST_URI} ^/(assets|media|favicon\.ico|robots\.txt|placeholder\.svg)
+  # НЕ перенаправлять: webhook деплоя и статика
+  RewriteCond %{REQUEST_URI} ^/(deploy\.php|assets|media|favicon\.ico|robots\.txt|placeholder\.svg)
   RewriteRule ^ - [L]
   
   # Если запрошенный файл или директория существует — отдаём их

@@ -9,7 +9,10 @@
 cd "$(dirname "$0")/.."
 REPO_ROOT="$(pwd)"
 
-# Убирает ошибку "dubious ownership" при запуске от пользователя веб-сервера (www-data)
+# Убирает ошибку "dubious ownership" при запуске от пользователя веб-сервера (www-data).
+# Сначала локальный конфиг (.git/config); если не сработает — один раз на сервере выполнить:
+#   sudo git config --system --add safe.directory /home/d/dsc23ytp/stroy/public_html
+git config --add safe.directory "$REPO_ROOT" 2>/dev/null || true
 git config --global --add safe.directory "$REPO_ROOT" 2>/dev/null || true
 
 echo "=== Git pull ==="

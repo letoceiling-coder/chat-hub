@@ -630,7 +630,7 @@ const ChatPage = () => {
       {/* Messages — при скролле вверх подгружаются более ранние сообщения */}
       <div
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto px-3 py-4"
+        className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-4"
         onScroll={() => {
           const el = messagesContainerRef.current;
           if (!el || !chatId || loadingMoreRef.current || !hasMoreOlder(chatId)) return;
@@ -679,12 +679,13 @@ const ChatPage = () => {
                       }}
                       transition={{ duration: 0.2 }}
                       className={cn(
-                        'flex rounded-lg transition-colors',
+                        'flex rounded-lg transition-colors min-w-0',
                         message.isOutgoing ? 'justify-end' : 'justify-start'
                       )}
                     >
                       <div
                         className={cn(
+                          'min-w-0 max-w-full',
                           pinnedIds.includes(message.id) && 'border-l-4 border-primary pl-1 rounded-l',
                           chat?.isChannel && message.senderId === chatId && 'relative'
                         )}

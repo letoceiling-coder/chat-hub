@@ -1,48 +1,70 @@
-# Инструкция по деплою
+# Деплой (сборка → Git → обновление на сервере)
 
-## OSPanel: Document Root = chat-hub
+## Локально: одна команда
 
-Если Document Root указывает на `C:\OSPanel\domains\messendger-dising-2\chat-hub`:
-
-1. Выполните **`npm run deploy:local`** — соберёт проект и скопирует файлы в корень chat-hub
-2. Откройте сайт в браузере (например, `http://messendger-dising-2.loc`)
-
-**Для разработки после deploy:** `index.html` будет перезаписан. Чтобы вернуть режим разработки:
 ```bash
-git checkout index.html
+npm run deploy
 ```
 
-### Вариант A: В корне домена (example.com/)
-1. Выполните `npm run build`
-2. Скопируйте **содержимое** папки `dist/` в корень сайта
-3. Убедитесь, что в Apache включён `mod_rewrite` и `AllowOverride All`
+Скрипт по порядку:
 
-### Вариант B: В подпапке (example.com/chat-hub/)
-1. В `vite.config.ts` задайте `base: "/chat-hub/"`
-2. Выполните `npm run build`
-3. Скопируйте содержимое `dist/` в папку `chat-hub` на сервере
+1. **Сборка** — `deploy:local` (восстановление `index.html`, `npm run build`, копирование `dist/` в корень).
+2. **Git** — `git add -A`, `git commit`, `git push origin main`.
+3. **Webhook** — GET-запрос на `DEPLOY_WEBHOOK_URL`, если переменная задана.
 
-## Ошибка "Expected a JavaScript module script but server responded with MIME type"
+Сообщение коммита по умолчанию — текущая дата/время. Своё сообщение:
 
-**Причины:**
-- Сервер не находит `/assets/index-xxx.js` и отдаёт index.html вместо него
-- Неверный Document Root — сервер смотрит не в ту папку
-- Приложение в подпапке, а base остался `/`
-
-**Решение:**
-1. Проверьте, что в корне сайта есть папка `assets/` с файлами `.js` и `.css`
-2. Откройте в браузере `https://ваш-сайт/assets/index-XXX.js` — должен загрузиться JS, а не HTML
-3. Если приложение в подпапке — см. Вариант B выше
-
-## Apache: необходимые модули
-```apache
-# Включить mod_rewrite
-a2enmod rewrite
-
-# В конфиге виртуального хоста:
-<Directory /path/to/your/site>
-    AllowOverride All
-    Options -MultiViews
-    DirectoryIndex index.html
-</Directory>
+```bash
+npm run deploy -- "Исправлена вёрстка голосовых сообщений"
 ```
+
+### Включение обновления на сервере по запросу
+
+Задайте URL, который на сервере запускает обновление из git (см. ниже):
+
+```bash
+# Windows (PowerShell)
+$env:DEPLOY_WEBHOOK_URL="https://post-ads.ru/deploy.php?token=YOUR_SECRET"; npm run deploy
+
+# Linux / macOS
+DEPLOY_WEBHOOK_URL=https://post-ads.ru/deploy.php?token=YOUR_SECRET npm run deploy
+```
+
+Можно прописать в `.env.local` (не коммитить) или в настройках CI.
+
+---
+
+## На сервере (post-ads.ru)
+
+### 1. Скрипт обновления
+
+В корне проекта на сервере уже есть `scripts/server-pull-and-deploy.sh`. Запуск вручную:
+
+```bash
+cd ~/stroy/public_html   # или ваш путь к проекту
+bash scripts/server-pull-and-deploy.sh
+```
+
+Скрипт выполняет: `git pull origin main`, `npm install`, `npm run deploy:local`.
+
+### 2. Webhook (обновление по запросу с локальной машины)
+
+1. Скопируйте пример PHP на сервер:
+   - из репозитория: `scripts/deploy-webhook.php.example`
+   - на сервер: в корень проекта как `deploy.php` (или в подпапку, тогда измените URL).
+
+2. Откройте `deploy.php` и задайте:
+   - `$secretToken` — свой секретный токен (тот же подставьте в `DEPLOY_WEBHOOK_URL`).
+   - `$projectRoot` — путь к корню проекта на сервере (если `deploy.php` не в корне).
+
+3. Выдайте права на выполнение скрипту:
+   ```bash
+   chmod +x scripts/server-pull-and-deploy.sh
+   ```
+
+4. Проверка в браузере или curl:
+   ```bash
+   curl "https://post-ads.ru/deploy.php?token=YOUR_SECRET"
+   ```
+
+После этого при запуске `npm run deploy` с заданным `DEPLOY_WEBHOOK_URL` сервер будет автоматически подтягивать код из git и пересобирать проект.

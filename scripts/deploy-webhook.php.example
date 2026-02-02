@@ -1,0 +1,40 @@
+<?php
+/**
+ * Пример webhook для обновления проекта на сервере.
+ * Скопируйте как deploy.php в корень сайта (рядом с index.html) или в защищённую папку.
+ *
+ * Ответ: 200 + DEPLOY_OK при успехе, 500 + DEPLOY_FAIL при ошибке (для скрипта деплоя).
+ * Вызов: GET https://post-ads.ru/deploy.php?token=YOUR_SECRET
+ */
+header('Content-Type: text/plain; charset=utf-8');
+
+$secretToken = 'CHANGE_ME'; // Замените на свой секретный токен
+$projectRoot = __DIR__;     // Если deploy.php в корне проекта; иначе укажите путь, например: '/home/user/public_html'
+
+$token = $_GET['token'] ?? '';
+if ($token !== $secretToken) {
+  http_response_code(403);
+  echo "DEPLOY_FAIL: Forbidden\n";
+  exit;
+}
+
+$script = $projectRoot . '/scripts/server-pull-and-deploy.sh';
+if (!is_file($script)) {
+  http_response_code(500);
+  echo "DEPLOY_FAIL: Script not found: $script\n";
+  exit;
+}
+
+$cmd = 'cd ' . escapeshellarg($projectRoot) . ' && bash ' . escapeshellarg($script) . ' 2>&1';
+$output = [];
+$returnCode = 0;
+exec($cmd, $output, $returnCode);
+$body = implode("\n", $output);
+
+if ($returnCode === 0 && (strpos($body, 'DEPLOY_OK') !== false)) {
+  http_response_code(200);
+  echo $body;
+} else {
+  http_response_code(500);
+  echo "DEPLOY_FAIL: update failed (exit code $returnCode)\n" . $body;
+}

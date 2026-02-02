@@ -212,7 +212,7 @@ export default function VoiceMessageBubble({
       ref={bubbleRef}
       data-voice-message
       className={cn(
-        'flex items-center gap-3 min-w-[var(--message-bubble-min-w)] max-w-[var(--message-bubble-max-w)] rounded-bubble px-3 py-2 shadow-soft transition-colors',
+        'flex items-center gap-3 min-w-0 max-w-[var(--message-bubble-max-w)] rounded-bubble px-3 py-2 shadow-soft transition-colors',
         message.isOutgoing
           ? 'rounded-bubble-outgoing bg-[hsl(var(--message-outgoing))]'
           : 'rounded-bubble-incoming bg-[hsl(var(--message-incoming))]',
@@ -233,16 +233,16 @@ export default function VoiceMessageBubble({
         )}
       </motion.button>
 
-      <div className="flex-1 min-w-0 flex flex-col gap-1">
-        <div className="flex items-center gap-2">
-          <div className="flex-1 flex items-center gap-0.5 h-6 overflow-hidden">
+      <div className="flex-1 min-w-0 flex flex-col gap-1 max-w-[160px]">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="flex-1 min-w-0 flex items-center gap-0.5 h-6 overflow-hidden max-w-[140px]">
             {waveform.slice(0, WAVEFORM_BARS).map((h, i) => {
               const filled = (i / WAVEFORM_BARS) * 100 <= progress;
               return (
                 <motion.span
                   key={i}
                   className={cn(
-                    'w-1 rounded-full min-h-[4px] transition-colors',
+                    'w-1 shrink-0 rounded-full min-h-[4px] transition-colors',
                     filled ? 'bg-primary' : 'bg-muted-foreground/40'
                   )}
                   style={{ height: `${h * 100}%` }}

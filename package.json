@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "node ./node_modules/vite/bin/vite.js build",
+    "deploy": "node scripts/deploy.cjs",
     "deploy:local": "node scripts/deploy-to-root.cjs",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",

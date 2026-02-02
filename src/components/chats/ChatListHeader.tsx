@@ -3,6 +3,7 @@ import { Search, Edit, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import UserAvatar from '@/components/common/Avatar';
+import OnlinePulse from '@/components/common/OnlinePulse';
 import { currentUser } from '@/data/mockData';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -71,10 +72,7 @@ const ChatListHeader = ({ onSearch, searchQuery }: ChatListHeaderProps) => {
                   size="md"
                   isOnline
                 />
-                {/* Online pulse indicator */}
-                <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white">
-                  <span className="absolute inset-0 rounded-full bg-green-500 animate-ping opacity-75" />
-                </span>
+                <OnlinePulse size="md" className="border-white" />
               </button>
               
               {/* App title */}

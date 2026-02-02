@@ -35,13 +35,14 @@ export default function BotButtons({
               whileTap={{ scale: 0.98 }}
               transition={{ duration: 0.1 }}
               className={cn(
-                'rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors',
+                'rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors flex items-center justify-center gap-2',
                 'bg-[#006CFF] hover:bg-[#0052CC] active:bg-[#004099]',
                 'border-0 shadow-sm'
               )}
               style={{ backgroundColor: '#006CFF' }}
               onClick={() => onInlineClick(btn)}
             >
+              <Zap className="h-4 w-4 shrink-0" />
               {btn.label}
             </motion.button>
           );

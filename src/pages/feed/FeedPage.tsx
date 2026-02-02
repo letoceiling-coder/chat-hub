@@ -24,6 +24,7 @@ const FeedPage = () => {
   const [postToShare, setPostToShare] = useState<FeedPost | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);
+  const [viewedStoryIds, setViewedStoryIds] = useState<Set<string>>(new Set());
 
   const doRefresh = async () => {
     setRefreshing(true);
@@ -127,7 +128,7 @@ const FeedPage = () => {
                     <span className="text-xs text-muted-foreground truncate max-w-[64px]">
                       {user?.name ?? authorId}
                     </span>
-                  </button>
+                  </motion.button>
                 );
               })}
             </div>

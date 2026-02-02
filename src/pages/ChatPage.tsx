@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Phone, Video, MoreVertical, Paperclip, Smile, Send, Mic, Check, CheckCheck, Reply, Copy, Trash2, Forward, Pin, Pencil, FileText, Sticker as StickerIcon, X } from 'lucide-react';
+import { ArrowLeft, Phone, Video, MoreVertical, Paperclip, Smile, Send, Mic, Check, CheckCheck, Reply, Copy, Trash2, Forward, Pin, Pencil, FileText, Sticker as StickerIcon, X, Megaphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import UserAvatar from '@/components/common/Avatar';
-import { formatMessageTime, formatLastSeen } from '@/data/mockData';
+import OnlinePulse from '@/components/common/OnlinePulse';
+import { formatMessageTime, formatLastSeen, formatViews } from '@/data/mockData';
 import { useContacts } from '@/context/ContactsContext';
 import { useChats } from '@/context/ChatsContext';
 import { useCall } from '@/context/CallContext';
@@ -77,6 +78,7 @@ const ChatPage = () => {
   const [recordSeconds, setRecordSeconds] = useState(0);
   const recordTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const mediaInputRef = useRef<HTMLInputElement | null>(null);
+  const [loadedMediaIds, setLoadedMediaIds] = useState<Set<string>>(new Set());
 
   const { startRecording, stopRecording, cancelRecording } = useVoiceRecorder();
   const {
@@ -556,38 +558,59 @@ const ChatPage = () => {
   return (
     <StickerProvider onSendSticker={handleSendSticker}>
     <div className="flex flex-col h-screen bg-secondary/30">
-      {/* Header */}
-      <header className="sticky top-0 z-40 bg-background border-b border-border pt-safe">
+      {/* Header: градиент для канала, обычный фон для чата */}
+      <header
+        className={cn(
+          'sticky top-0 z-40 border-b pt-safe',
+          chat.isChannel
+            ? 'bg-[length:100%_100%] border-violet-500/20 text-white'
+            : 'bg-background border-border'
+        )}
+        style={chat.isChannel ? { backgroundImage: 'var(--gradient-channel)' } : undefined}
+      >
         <div className="flex items-center h-14 px-2 gap-2">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => navigate('/')}
+            className={chat.isChannel ? 'text-white hover:bg-white/10' : ''}
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          
+
           <div
             className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer"
             onClick={() => setChatInfoOpen(true)}
           >
-            <UserAvatar
-              name={chat.name}
-              size="md"
-              isOnline={!chat.isGroup && !chat.isBot && !chat.isChannel && chat.isOnline}
-            />
+            <div className="relative shrink-0">
+              <UserAvatar
+                name={chat.name}
+                size="md"
+                isOnline={!chat.isGroup && !chat.isBot && !chat.isChannel && chat.isOnline}
+              />
+              {!chat.isBot && !chat.isChannel && chat.isOnline && (
+                <OnlinePulse size="md" className={chat.isChannel ? 'border-white' : undefined} />
+              )}
+            </div>
             <div className="min-w-0">
-              <p className="font-semibold truncate">{chat.name}</p>
-              <p className={cn(
-                'text-xs truncate',
-                chat.isOnline || isTyping ? 'text-primary' : 'text-muted-foreground'
-              )}>
-                {getStatusText()}
+              <div className="flex items-center gap-1.5">
+                {chat.isChannel && <Megaphone className="h-4 w-4 shrink-0 text-white/90" />}
+                <p className="font-semibold truncate">{chat.name}</p>
+              </div>
+              <p
+                className={cn(
+                  'text-xs truncate',
+                  chat.isChannel ? 'text-white/80' : chat.isOnline || isTyping ? 'text-primary' : 'text-muted-foreground'
+                )}
+              >
+                {chat.isChannel && chat.subscribersCount != null
+                  ? `${formatViews(chat.subscribersCount)} подписчиков`
+                  : getStatusText()}
               </p>
             </div>
           </div>
           
-          <div className="flex items-center">
+          <div className={cn('flex items-center', chat.isChannel && 'text-white')}>
             {!chat.isBot && !chat.isChannel && (
               <>
                 <Button
@@ -595,6 +618,7 @@ const ChatPage = () => {
                   size="icon"
                   onClick={() => contactInfo && startOutgoingCall(contactInfo, 'audio')}
                   disabled={!contactInfo}
+                  className={chat.isChannel ? 'text-white hover:bg-white/10' : ''}
                 >
                   <Phone className="h-5 w-5" />
                 </Button>
@@ -603,12 +627,17 @@ const ChatPage = () => {
                   size="icon"
                   onClick={() => contactInfo && startOutgoingCall(contactInfo, 'video')}
                   disabled={!contactInfo}
+                  className={chat.isChannel ? 'text-white hover:bg-white/10' : ''}
                 >
                   <Video className="h-5 w-5" />
                 </Button>
               </>
             )}
-            <Button variant="ghost" size="icon">
+            <Button
+              variant="ghost"
+              size="icon"
+              className={chat.isChannel ? 'text-white hover:bg-white/10' : ''}
+            >
               <MoreVertical className="h-5 w-5" />
             </Button>
           </div>
@@ -670,14 +699,14 @@ const ChatPage = () => {
                     <div className="mb-2">
                     <motion.div
                       id={`msg-${message.id}`}
-                      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                      initial={{ opacity: 0, y: 12, scale: 0.98 }}
                       animate={{
                         opacity: 1,
                         y: 0,
                         scale: 1,
                         backgroundColor: highlightMessageId === message.id ? 'hsl(var(--muted))' : 'transparent',
                       }}
-                      transition={{ duration: 0.2 }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 35 }}
                       className={cn(
                         'flex rounded-lg transition-colors min-w-0',
                         message.isOutgoing ? 'justify-end' : 'justify-start'
@@ -729,7 +758,11 @@ const ChatPage = () => {
                             <img
                               src={message.mediaUrl}
                               alt=""
-                              className="max-h-[240px] w-full object-cover"
+                              className={cn(
+                                'max-h-[240px] w-full object-cover transition-[filter] duration-200',
+                                !loadedMediaIds.has(message.id) && 'blur-md'
+                              )}
+                              onLoad={() => setLoadedMediaIds((prev) => new Set(prev).add(message.id))}
                             />
                             <div className="px-3 py-2 flex items-center justify-between gap-1.5">
                               <span className="text-[10px] text-muted-foreground">
@@ -757,10 +790,14 @@ const ChatPage = () => {
                           >
                             <video
                               src={message.mediaUrl}
-                              className="max-h-[240px] w-full object-cover"
+                              className={cn(
+                                'max-h-[240px] w-full object-cover transition-[filter] duration-200',
+                                !loadedMediaIds.has(message.id) && 'blur-md'
+                              )}
                               muted
                               playsInline
                               preload="metadata"
+                              onLoadedData={() => setLoadedMediaIds((prev) => new Set(prev).add(message.id))}
                             />
                             <div className="px-3 py-2 flex items-center justify-between gap-1.5">
                               <span className="text-[10px] text-muted-foreground">
@@ -1138,9 +1175,9 @@ const ChatPage = () => {
         </div>
       )}
 
-      {/* Input area — для каналов скрыта (только чтение постов) */}
+      {/* Input area — для каналов скрыта (только чтение постов); плавающий стиль */}
       {!chat?.isChannel && (
-      <div className="sticky bottom-0 bg-background border-t border-border pb-safe">
+      <div className="sticky bottom-0 bg-background border-t border-border pb-safe rounded-t-2xl shadow-soft">
         {(replyToMessage || editMessageId) && !recordingVoice && !recordingVideoNote && (
           <div className="flex items-center gap-2 px-3 py-2 bg-muted/60 border-b border-border">
             <div className="flex-1 min-w-0">
@@ -1310,36 +1347,54 @@ const ChatPage = () => {
               </div>
             </div>
 
-            {inputValue.trim() ? (
-              <Button
-                size="icon"
-                onClick={handleSendMessage}
-                className="shrink-0 rounded-full bg-primary"
-              >
-                <Send className="h-5 w-5" />
-              </Button>
-            ) : (
-              <>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="shrink-0 text-muted-foreground"
-                  onClick={() => setRecordingVideoNote(true)}
+            <AnimatePresence mode="wait">
+              {inputValue.trim() ? (
+                <motion.div
+                  key="send"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                  className="shrink-0"
                 >
-                  <Video className="h-5 w-5" />
-                </Button>
-                <Button
-                  size="icon"
-                  className="shrink-0 rounded-full bg-secondary text-muted-foreground"
-                  onClick={async () => {
-                    const ok = await startRecording();
-                    if (ok) setRecordingVoice(true);
-                  }}
+                  <Button
+                    size="icon"
+                    onClick={handleSendMessage}
+                    className="rounded-full bg-primary"
+                  >
+                    <Send className="h-5 w-5" />
+                  </Button>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="mic"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                  className="flex items-center gap-0 shrink-0"
                 >
-                  <Mic className="h-5 w-5" />
-                </Button>
-              </>
-            )}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="shrink-0 text-muted-foreground"
+                    onClick={() => setRecordingVideoNote(true)}
+                  >
+                    <Video className="h-5 w-5" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    className="shrink-0 rounded-full bg-secondary text-muted-foreground"
+                    onClick={async () => {
+                      const ok = await startRecording();
+                      if (ok) setRecordingVoice(true);
+                    }}
+                  >
+                    <Mic className="h-5 w-5" />
+                  </Button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         )}
       </div>

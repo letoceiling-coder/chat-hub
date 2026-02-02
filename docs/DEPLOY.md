@@ -40,7 +40,46 @@ DEPLOY_WEBHOOK_URL=https://post-ads.ru/deploy.php?token=YOUR_SECRET npm run depl
 
 ---
 
+## Пошаговая настройка сервера (один раз)
+
+Чтобы с локального компьютера команда `npm run deploy` обновляла код на сервере, на сервере нужно сделать следующее **один раз**. Подключайтесь по SSH под пользователем, у которого есть доступ к репозиторию (например, `dsc23ytp`).
+
+| Шаг | Действие |
+|-----|----------|
+| **1** | Подключиться по SSH к серверу. |
+| **2** | Перейти в корень проекта: `cd ~/stroy/public_html` (или ваш путь, где лежит `index.html`, `scripts/`). |
+| **3** | Убедиться, что в проекте есть файлы из репозитория: `scripts/deploy-webhook.php.example`, `scripts/server-pull-and-deploy.sh`, `scripts/cron-deploy-check.sh`. Если нет — выполнить `git pull origin main`. |
+| **4** | Создать webhook: скопировать пример в корень проекта.<br>`cp scripts/deploy-webhook.php.example deploy.php` |
+| **5** | Открыть `deploy.php` в редакторе и заменить `CHANGE_ME` на ваш секретный токен (тот же, что в локальном `.env.deploy` и в `scripts/SERVER_DEPLOY_TOKEN.txt`). Сохранить файл. |
+| **6** | Сделать скрипты исполняемыми:<br>`chmod +x scripts/server-pull-and-deploy.sh scripts/cron-deploy-check.sh` |
+| **7** | Настроить запуск скрипта раз в минуту (см. ниже **«Если crontab недоступен»**). |
+| **8** | Проверить: в браузере открыть<br>`https://post-ads.ru/deploy.php?token=ВАШ_ТОКЕН&mode=cron`<br>Должен вернуться ответ с текстом `DEPLOY_QUEUED`. |
+
+После этого при запуске **локально** команды `npm run deploy` (с настроенным `.env.deploy` и URL с `&mode=cron`) сервер в течение минуты подтянет код из git и пересоберёт проект.
+
+### Если на сервере «crontab: command not found»
+
+На shared-хостинге часто нет доступа к `crontab`. Варианты:
+
+**Вариант А — Cron через панель хостинга**  
+Если есть панель (cPanel, Plesk, ISPmanager и т.п.), откройте раздел **«Планировщик задач» / «Cron Jobs»** и добавьте задачу с интервалом **каждую минуту** и командой:
+```bash
+cd /home/d/dsc23ytp/stroy/public_html && bash scripts/cron-deploy-check.sh >> /tmp/deploy.log 2>&1
+```
+(путь замените на свой; часто в панели указывают только команду, а каталог задаётся отдельно или в самой команде.)
+
+**Вариант Б — Без cron: обновление вручную по SSH**  
+Cron не настраивать. После каждого `npm run deploy` локально подключайтесь по SSH к серверу и выполняйте:
+```bash
+cd ~/stroy/public_html && bash scripts/server-pull-and-deploy.sh
+```
+Тогда webhook с `&mode=cron` можно не вызывать (или вызывать — флаг создастся, но обрабатывать его будет некому; для проверки URL ответ будет `DEPLOY_QUEUED`, но обновление не произойдёт, пока вы не запустите скрипт вручную).
+
+---
+
 ## На сервере (post-ads.ru)
+
+**Важно:** на сервере нет sudo. Обновление по webhook возможно только через **режим cron**; прямой запуск скрипта из PHP даёт ошибку «dubious ownership» у git.
 
 ### 1. Скрипт обновления
 
@@ -73,9 +112,9 @@ bash scripts/server-pull-and-deploy.sh
    curl "https://post-ads.ru/deploy.php?token=YOUR_SECRET"
    ```
 
-5. **Если webhook возвращает 500 и «dubious ownership»** (нет sudo на сервере) — используйте **режим cron** (см. п. 6).
+5. На этом сервере **всегда используйте режим cron** (п. 6): прямой вызов скрипта из PHP не работает из‑за отсутствия sudo.
 
-6. **Режим cron (сервер без sudo):** webhook только создаёт флаг; обновление выполняет cron под вашим пользователем.
+6. **Режим cron (обязателен, т.к. на сервере нет sudo):** webhook только создаёт флаг; обновление выполняет cron под вашим пользователем.
    - В **`.env.deploy`** (локально) укажите URL с **`&mode=cron`**:
      ```
      DEPLOY_WEBHOOK_URL=https://post-ads.ru/deploy.php?token=YOUR_SECRET&mode=cron

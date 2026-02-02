@@ -3,11 +3,12 @@
  * Пример webhook для обновления проекта на сервере.
  * Скопируйте как deploy.php в корень сайта (рядом с index.html) или в защищённую папку.
  *
- * Вызов: GET https://post-ads.ru/deploy.php?token=YOUR_SECRET
- * Ответ: 200 + DEPLOY_OK при успехе, 500 + DEPLOY_FAIL при ошибке.
+ * На этом сервере нет sudo — используйте только вызов с &mode=cron (см. ниже).
  *
- * Режим cron (без sudo): добавьте &mode=cron — webhook создаст флаг .deploy-requested,
- * обновление выполнит cron (см. scripts/cron-deploy-check.sh и docs/DEPLOY.md).
+ * Вызов: GET https://post-ads.ru/deploy.php?token=YOUR_SECRET&mode=cron
+ * Ответ: 200 + DEPLOY_QUEUED (обновление выполнит cron в течение минуты).
+ *
+ * Без &mode=cron: PHP запускает git pull от пользователя веб-сервера → «dubious ownership» → 500.
  */
 header('Content-Type: text/plain; charset=utf-8');
 

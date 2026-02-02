@@ -114,6 +114,8 @@ export interface Chat {
   isBot?: boolean;
   /** Канал (только посты от канала, без ответов пользователя в ленте) */
   isChannel?: boolean;
+  /** Канал: количество подписчиков (для отображения в header) */
+  subscribersCount?: number;
   /** Клавиатура бота (ряды кнопок под полем ввода). Фон кнопок #25D366, 14px */
   keyboard?: BotKeyboardRow[];
   lastMessage?: Message;

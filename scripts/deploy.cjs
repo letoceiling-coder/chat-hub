@@ -74,11 +74,14 @@ async function main() {
       const { statusCode, data } = await fetchUrl(webhookUrl);
       const body = (data || '').trim();
       const isOk = statusCode >= 200 && statusCode < 300 && (body.includes('DEPLOY_OK') || body.includes('Готово'));
+      const isQueued = statusCode >= 200 && statusCode < 300 && body.includes('DEPLOY_QUEUED');
       const isFail = statusCode >= 400 || body.includes('DEPLOY_FAIL');
 
       if (isOk) {
         console.log('Сервер: обновление успешно.');
         if (body) console.log(body.slice(-500));
+      } else if (isQueued) {
+        console.log('Сервер: обновление поставлено в очередь (выполнится в течение минуты по cron).');
       } else if (isFail) {
         console.error('Сервер: обновление неуспешно.');
         console.error('Ответ:', statusCode, body || '(пусто)');

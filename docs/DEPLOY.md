@@ -69,10 +69,22 @@ bash scripts/server-pull-and-deploy.sh
    curl "https://post-ads.ru/deploy.php?token=YOUR_SECRET"
    ```
 
-5. **Если webhook возвращает 500 и «dubious ownership»:** один раз на сервере (с sudo) выполните:
-   ```bash
-   sudo git config --system --add safe.directory /home/d/dsc23ytp/stroy/public_html
-   ```
-   Подставьте свой путь к проекту. После этого webhook будет работать от пользователя веб-сервера (www-data).
+5. **Если webhook возвращает 500 и «dubious ownership»** (нет sudo на сервере) — используйте **режим cron** (см. п. 6).
+
+6. **Режим cron (сервер без sudo):** webhook только создаёт флаг; обновление выполняет cron под вашим пользователем.
+   - В **`.env.deploy`** (локально) укажите URL с **`&mode=cron`**:
+     ```
+     DEPLOY_WEBHOOK_URL=https://post-ads.ru/deploy.php?token=YOUR_SECRET&mode=cron
+     ```
+   - На сервере настройте cron (один раз):
+     ```bash
+     crontab -e
+     ```
+     Добавьте строку (подставьте свой путь):
+     ```
+     * * * * * cd /home/d/dsc23ytp/stroy/public_html && bash scripts/cron-deploy-check.sh >> /tmp/deploy.log 2>&1
+     ```
+   - Выдайте права: `chmod +x scripts/cron-deploy-check.sh`
+   - При вызове webhook с `mode=cron` сервер вернёт `DEPLOY_QUEUED`; обновление выполнится в течение минуты.
 
 После этого при запуске `npm run deploy` с заданным `DEPLOY_WEBHOOK_URL` сервер будет автоматически подтягивать код из git и пересобирать проект.

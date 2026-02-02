@@ -26,3 +26,4 @@ dist-ssr
 # Деплой: токен и URL webhook (не коммитить)
 .env.deploy
 scripts/SERVER_DEPLOY_TOKEN.txt
+.deploy-requested

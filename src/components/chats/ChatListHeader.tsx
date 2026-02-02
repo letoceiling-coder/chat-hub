@@ -24,7 +24,7 @@ const ChatListHeader = ({ onSearch, searchQuery }: ChatListHeaderProps) => {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-background border-b border-border pt-safe">
+    <header className="sticky top-0 z-40 bg-gradient-to-r from-primary/95 to-primary border-b border-primary/20 pt-safe shadow-soft">
       <div className="flex items-center justify-between h-14 px-4">
         {/* Left side - User avatar or back button */}
         <AnimatePresence mode="wait">
@@ -40,7 +40,7 @@ const ChatListHeader = ({ onSearch, searchQuery }: ChatListHeaderProps) => {
                 variant="ghost"
                 size="icon"
                 onClick={handleSearchToggle}
-                className="shrink-0"
+                className="shrink-0 text-white hover:bg-white/10"
               >
                 <X className="h-5 w-5" />
               </Button>
@@ -50,7 +50,7 @@ const ChatListHeader = ({ onSearch, searchQuery }: ChatListHeaderProps) => {
                 value={searchQuery}
                 onChange={(e) => onSearch(e.target.value)}
                 autoFocus
-                className="flex-1 h-9 bg-secondary border-none focus-visible:ring-0"
+                className="flex-1 h-9 bg-white/20 border-none focus-visible:ring-0 text-white placeholder:text-white/70"
               />
             </motion.div>
           ) : (
@@ -61,20 +61,24 @@ const ChatListHeader = ({ onSearch, searchQuery }: ChatListHeaderProps) => {
               exit={{ opacity: 0 }}
               className="flex items-center gap-3 flex-1"
             >
-              {/* User avatar - opens settings */}
+              {/* User avatar - opens settings with online pulse */}
               <button 
                 onClick={() => navigate('/settings')}
-                className="touch-feedback rounded-full"
+                className="relative touch-feedback rounded-full"
               >
                 <UserAvatar 
                   name={currentUser.name} 
                   size="md"
                   isOnline
                 />
+                {/* Online pulse indicator */}
+                <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white">
+                  <span className="absolute inset-0 rounded-full bg-green-500 animate-ping opacity-75" />
+                </span>
               </button>
               
               {/* App title */}
-              <h1 className="text-xl font-semibold text-primary">Messenger</h1>
+              <h1 className="text-xl font-semibold text-white drop-shadow-sm">Messenger</h1>
             </motion.div>
           )}
         </AnimatePresence>
@@ -86,18 +90,23 @@ const ChatListHeader = ({ onSearch, searchQuery }: ChatListHeaderProps) => {
               variant="ghost"
               size="icon"
               onClick={handleSearchToggle}
-              className="text-muted-foreground hover:text-foreground"
+              className="text-white/80 hover:text-white hover:bg-white/10"
             >
               <Search className="h-5 w-5" />
             </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate('/contacts')}
-              className="text-muted-foreground hover:text-foreground"
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
-              <Edit className="h-5 w-5" />
-            </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate('/contacts')}
+                className="text-white/80 hover:text-white hover:bg-white/10"
+              >
+                <Edit className="h-5 w-5" />
+              </Button>
+            </motion.div>
           </div>
         )}
       </div>

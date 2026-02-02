@@ -8,6 +8,8 @@ const CURRENT_USER_ID = 'user-1';
 interface MessagesContextValue {
   /** Последние N сообщений чата (N = MESSAGES_PAGE_SIZE + подгрузки при скролле вверх) */
   getMessages: (chatId: string) => Message[];
+  /** Все сообщения чата без лимита */
+  getAllMessages: (chatId: string) => Message[];
   setMessagesForChat: (chatId: string, updater: (prev: Message[]) => Message[]) => void;
   addMessageToChat: (chatId: string, message: Message) => void;
   /** Удалить сообщение (например свой комментарий) */

@@ -4,6 +4,7 @@ import { Menu, Search, UserPlus, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import UserAvatar from '@/components/common/Avatar';
+import EmptyState from '@/components/common/EmptyState';
 import { useChats } from '@/context/ChatsContext';
 import { useContacts } from '@/context/ContactsContext';
 import { Contact } from '@/types/messenger';

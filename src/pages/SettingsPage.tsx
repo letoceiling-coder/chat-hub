@@ -48,6 +48,7 @@ interface SettingItemProps {
   value?: React.ReactNode;
   onClick?: () => void;
   danger?: boolean;
+  iconBg?: string;
 }
 
 const SettingItem = ({
@@ -56,19 +57,26 @@ const SettingItem = ({
   value,
   onClick,
   danger,
+  iconBg,
 }: SettingItemProps) => (
   <motion.div
-    whileTap={{ backgroundColor: 'hsl(var(--secondary))' }}
+    whileTap={{ scale: 0.98 }}
     onClick={onClick}
     className={cn(
-      'flex items-center gap-4 px-4 py-3 cursor-pointer active:bg-secondary',
+      'flex items-center gap-4 px-4 py-3 cursor-pointer active:bg-secondary transition-all',
       danger && 'text-destructive'
     )}
   >
-    <span className={cn('text-muted-foreground', danger && 'text-destructive')}>
+    <span
+      className={cn(
+        'w-8 h-8 rounded-lg flex items-center justify-center shrink-0',
+        iconBg || 'bg-muted',
+        danger && 'bg-destructive/10 text-destructive'
+      )}
+    >
       {icon}
     </span>
-    <span className="flex-1">{label}</span>
+    <span className="flex-1 font-medium">{label}</span>
     {value !== undefined ? value : <ChevronRight className="h-5 w-5 text-muted-foreground" />}
   </motion.div>
 );
@@ -113,75 +121,92 @@ const SettingsPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-40 bg-background border-b border-border pt-safe">
+      <header className="sticky top-0 z-40 bg-gradient-to-r from-primary/95 to-primary border-b border-primary/20 pt-safe shadow-soft">
         <div className="h-14 px-4 flex items-center">
-          <h1 className="text-xl font-semibold">Настройки</h1>
+          <h1 className="text-xl font-semibold text-white">Настройки</h1>
         </div>
       </header>
 
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="pb-8">
-        {/* Profile — tap → openProfile */}
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="pb-8">
+        {/* Profile Card — enhanced */}
         <div
-          className="flex items-center gap-4 p-4 cursor-pointer active:bg-secondary"
+          className="mx-4 mt-4 p-4 rounded-2xl bg-card border border-border shadow-soft cursor-pointer active:bg-secondary/50 transition-all"
           onClick={() => navigate('/profile')}
         >
-          <UserAvatar name={currentUser.name} size="xl" isOnline />
-          <div className="flex-1 min-w-0">
-            <p className="text-lg font-semibold truncate">{currentUser.name}</p>
-            <p className="text-sm text-muted-foreground truncate">@{currentUser.username}</p>
-            <p className="text-sm text-muted-foreground truncate">{currentUser.phone}</p>
+          <div className="flex items-center gap-4">
+            {/* Avatar with gradient ring */}
+            <div className="relative">
+              <div className="p-0.5 rounded-full bg-gradient-to-br from-primary via-primary/80 to-primary/60">
+                <div className="p-0.5 rounded-full bg-background">
+                  <UserAvatar name={currentUser.name} size="xl" isOnline />
+                </div>
+              </div>
+              {/* Online indicator */}
+              <span className="absolute bottom-1 right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-lg font-semibold truncate">{currentUser.name}</p>
+              <p className="text-sm text-muted-foreground truncate">@{currentUser.username}</p>
+              <p className="text-sm text-muted-foreground truncate">{currentUser.phone}</p>
+            </div>
+            <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0" />
           </div>
-          <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0" />
+          {currentUser.bio && (
+            <div className="mt-3 pt-3 border-t border-border">
+              <p className="text-sm text-muted-foreground">О себе</p>
+              <p className="mt-1 text-sm">{currentUser.bio}</p>
+            </div>
+          )}
         </div>
 
-        {currentUser.bio && (
-          <div className="px-4 py-3 border-t border-border">
-            <p className="text-sm text-muted-foreground">О себе</p>
-            <p className="mt-1">{currentUser.bio}</p>
-          </div>
-        )}
-
-        {/* Profile */}
-        <div className="mt-4 border-t border-border">
+        {/* Settings Sections with colorful icons */}
+        <div className="mt-6 mx-4 rounded-2xl bg-card border border-border overflow-hidden shadow-soft">
           <SettingItem
-            icon={<User className="h-5 w-5" />}
-            label="Профиль"
-            onClick={() => navigate('/profile')}
-          />
-        </div>
-
-        {/* Notifications */}
-        <div className="mt-4 border-t border-border">
-          <SettingItem
-            icon={<Bell className="h-5 w-5" />}
+            icon={<Bell className="h-5 w-5 text-white" />}
+            iconBg="bg-red-500"
             label="Уведомления"
             value={<Switch checked={settings.notifications} onCheckedChange={toggleNotifications} />}
           />
         </div>
 
-        {/* Privacy & Security */}
-        <div className="mt-4 border-t border-border">
-          <SettingItem icon={<Lock className="h-5 w-5" />} label="Приватность" />
-          <SettingItem icon={<Shield className="h-5 w-5" />} label="Безопасность" />
+        <div className="mt-4 mx-4 rounded-2xl bg-card border border-border overflow-hidden shadow-soft">
+          <SettingItem
+            icon={<Lock className="h-5 w-5 text-white" />}
+            iconBg="bg-blue-500"
+            label="Приватность"
+          />
+          <div className="border-t border-border" />
+          <SettingItem
+            icon={<Shield className="h-5 w-5 text-white" />}
+            iconBg="bg-green-500"
+            label="Безопасность"
+          />
         </div>
 
-        {/* Appearance — spec: Light / Dark / System, Font size, Chat wallpaper */}
-        <div className="mt-4 border-t border-border">
+        <div className="mt-4 mx-4 rounded-2xl bg-card border border-border overflow-hidden shadow-soft">
           <SettingItem
-            icon={<Palette className="h-5 w-5" />}
+            icon={<Palette className="h-5 w-5 text-white" />}
+            iconBg="bg-violet-500"
             label="Внешний вид"
             onClick={() => setAppearanceOpen(true)}
           />
         </div>
 
-        {/* Devices */}
-        <div className="mt-4 border-t border-border">
-          <SettingItem icon={<Smartphone className="h-5 w-5" />} label="Устройства" />
-          <SettingItem icon={<HelpCircle className="h-5 w-5" />} label="Помощь" />
+        <div className="mt-4 mx-4 rounded-2xl bg-card border border-border overflow-hidden shadow-soft">
+          <SettingItem
+            icon={<Smartphone className="h-5 w-5 text-white" />}
+            iconBg="bg-orange-500"
+            label="Устройства"
+          />
+          <div className="border-t border-border" />
+          <SettingItem
+            icon={<HelpCircle className="h-5 w-5 text-white" />}
+            iconBg="bg-cyan-500"
+            label="Помощь"
+          />
         </div>
 
-        {/* Logout — modal confirm */}
-        <div className="mt-4 border-t border-border">
+        <div className="mt-4 mx-4 rounded-2xl bg-card border border-border overflow-hidden shadow-soft">
           <SettingItem
             icon={<LogOut className="h-5 w-5" />}
             label="Выйти"

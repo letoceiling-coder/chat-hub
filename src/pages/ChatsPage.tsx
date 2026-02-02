@@ -25,7 +25,7 @@ import {
 const ChatsPage = () => {
   const navigate = useNavigate();
   const { chats, pinChat, muteChat, archiveChat, deleteChat } = useChats();
-  const { getAllMessages } = useMessages();
+  const { getMessages } = useMessages();
   const [searchQuery, setSearchQuery] = useState('');
   const [chatToDelete, setChatToDelete] = useState<Chat | null>(null);
   const [openedChatId, setOpenedChatId] = useState<string | null>(null);
@@ -63,7 +63,7 @@ const ChatsPage = () => {
       const timeB = b.lastMessage?.timestamp.getTime() || 0;
       return timeB - timeA;
     });
-  }, [chats, searchQuery, getAllMessages]);
+  }, [chats, searchQuery, getMessages]);
 
   const handleChatClick = (chat: Chat) => {
     navigate(`/chat/${chat.id}`);

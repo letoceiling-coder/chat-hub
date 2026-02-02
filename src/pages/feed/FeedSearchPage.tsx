@@ -28,8 +28,8 @@ const FeedSearchPage = () => {
 
   const q = query.trim().toLowerCase();
 
-  const suggestions = useMemo(() => {
-    if (!q) return [];
+  const suggestions = useMemo((): { users: typeof feedUsers; hashtags: string[] } => {
+    if (!q) return { users: [], hashtags: [] };
     const users = feedUsers
       .filter((u) => u.id !== CURRENT_USER_ID)
       .filter(

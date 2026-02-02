@@ -348,9 +348,9 @@ const ChatListItem = ({
           role="button"
           tabIndex={0}
           className={cn(
-            'flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors touch-pan-y',
+            'flex items-center gap-3 px-4 py-3 cursor-pointer transition-all touch-pan-y',
             'bg-background active:bg-secondary flex-1 min-w-0',
-            chat.isPinned && 'bg-secondary/50'
+            chat.isPinned && 'bg-gradient-to-r from-primary/5 to-transparent border-l-2 border-l-primary/40'
           )}
           onClick={handleContentClick}
           onKeyDown={(e) => {
@@ -360,12 +360,28 @@ const ChatListItem = ({
             }
           }}
           whileTap={{ backgroundColor: 'hsl(var(--secondary))' }}
+          style={{
+            boxShadow: chat.isPinned ? '0 1px 3px rgba(0,0,0,0.05)' : 'none',
+          }}
         >
-          <UserAvatar
-            name={chat.name}
-            size="lg"
-            isOnline={!chat.isGroup && !chat.isBot && !chat.isChannel && chat.isOnline}
-          />
+          {/* Avatar with online pulse */}
+          <div className="relative">
+            <UserAvatar
+              name={chat.name}
+              size="lg"
+              isOnline={!chat.isGroup && !chat.isBot && !chat.isChannel && chat.isOnline}
+            />
+            {chat.isBot && (
+              <span className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-primary rounded-full flex items-center justify-center border-2 border-background">
+                <Bot className="h-3 w-3 text-primary-foreground" />
+              </span>
+            )}
+            {chat.isChannel && (
+              <span className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-violet-500 rounded-full flex items-center justify-center border-2 border-background">
+                <Megaphone className="h-3 w-3 text-white" />
+              </span>
+            )}
+          </div>
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between gap-2">
@@ -376,15 +392,6 @@ const ChatListItem = ({
                 )}
               >
                 {chat.name}
-                {chat.isBot && (
-                  <span className="shrink-0 inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-normal bg-muted text-muted-foreground">
-                    <Bot className="h-3 w-3" />
-                    бот
-                  </span>
-                )}
-                {chat.isChannel && (
-                  <Megaphone className="h-4 w-4 shrink-0 text-muted-foreground" aria-label="Канал" />
-                )}
               </span>
 
               <div className="flex items-center gap-1 shrink-0">
@@ -408,7 +415,14 @@ const ChatListItem = ({
                 )}
               >
                 {chat.isTyping ? (
-                  <span className="text-primary">печатает...</span>
+                  <span className="text-primary inline-flex items-center gap-1">
+                    печатает
+                    <span className="inline-flex gap-0.5">
+                      <span className="w-1 h-1 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="w-1 h-1 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <span className="w-1 h-1 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }} />
+                    </span>
+                  </span>
                 ) : (
                   getMessagePreview()
                 )}
@@ -419,7 +433,7 @@ const ChatListItem = ({
                   <VolumeX className="h-4 w-4 text-muted-foreground" />
                 )}
                 {chat.isPinned && (
-                  <Pin className="h-4 w-4 text-muted-foreground rotate-45" />
+                  <Pin className="h-4 w-4 text-primary/60 rotate-45" />
                 )}
                 {chat.unreadCount > 0 && (
                   <motion.span
@@ -427,7 +441,7 @@ const ChatListItem = ({
                     animate={{ scale: 1 }}
                     className={cn(
                       'min-w-[20px] h-5 px-1.5 flex items-center justify-center',
-                      'rounded-full text-xs font-medium',
+                      'rounded-full text-xs font-medium shadow-sm',
                       chat.isMuted
                         ? 'bg-muted-foreground text-background'
                         : 'bg-primary text-primary-foreground'
